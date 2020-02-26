@@ -9,6 +9,7 @@ See this [technical blog post](https://www.weave.works/blog/gitops-with-github-a
 1. Create an EKS cluster, e.g. using [`eksctl create cluster`](https://eksctl.io/)
 1. Set up Flux on the cluster, e.g. using [this guide](https://docs.fluxcd.io/en/latest/tutorials/get-started.html). Note that you must set `--git-path` to point to where your manifests are. For example:
 ```bash
+export GHUSER=<github user that flux commits will be associated with>
 export GHOWNER=<github user or organization account where your fork lives>
 export GHREPO=example-actions-flux-eks
 
@@ -17,7 +18,7 @@ kubectl create ns flux
 fluxctl install \
     --git-user=${GHUSER} \
     --git-email=${GHUSER}@users.noreply.github.com \
-    --git-url=git@github.com:${GHOWNER}/${GHREPO} \
+    --git-url=git@github.com:${GHOWNER}/${GHREPO}.git \
     --git-path=manifests \
     --namespace=flux | kubectl apply -f -
 ```
@@ -40,7 +41,7 @@ The [example workflow](.github/workflows/build.yml) will trigger on every push t
 For _pull requests_, the workflow will:
 1. Build and tag [the Docker image](app/Dockerfile)
     - The image will be tagged with the feature branch's HEAD commit SHA
-    
+
 For _pushes_ to the default branch (`master`), in addition to the above, the workflow will:
 
 1. Push the image to Amazon Elastic Container Registry
